@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Answerlytica - Earn by Answering Questions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Global Styles */
+    :root {
+      --primary: #4361ee;
+      --secondary: #3a0ca3;
+      --accent: #7209b7;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --success: #4bb543;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fb;
+      color: var(--dark);
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    nav a {
+      color: white;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #d0d0ff;
+    }
+
+    .auth-buttons a {
+      background: var(--accent);
+      padding: 0.5rem 1.2rem;
+      color: white;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+
+    .auth-buttons a:hover {
+      background: #5a08a0;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 5rem 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      animation: fadeIn 1s ease;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      font-size: 1.1rem;
+    }
+
+    .btn-primary {
+      background: white;
+      color: var(--primary);
+      font-weight: 600;
+      padding: 0.8rem 1.6rem;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--light-gray);
+    }
+
+    /* Features */
+    .features {
+      background: white;
+      padding: 4rem 1rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .feature-card {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      transition: 0.3s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    /* Form Sections */
+    .form-container {
+      max-width: 600px;
+      background: white;
+      margin: 3rem auto;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid var(--light-gray);
+      border-radius: 5px;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+    }
+
+    footer p {
+      color: #adb5bd;
+      font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-graduation-cap"></i> Answerlytica
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#features">How It Works</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="auth-buttons">
+        <a href="#" id="loginBtn">Login</a>
+        <a href="#" id="registerBtn">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Earn by Answering Questions</h1>
+    <p>Join Answerlytica — write answers, share your expertise, and earn money for quality work.</p>
+    <a href="#" class="btn-primary" id="heroRegisterBtn">Get Started</a>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="section-title">
+      <h2>How It Works</h2>
+      <p>Simple, transparent, and rewarding. Share your knowledge and grow your income.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-user-plus"></i></div>
+        <h3>Create an Account</h3>
+        <p>Sign up with your details and qualifications to get started.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-pen-fancy"></i></div>
+        <h3>Write Answers</h3>
+        <p>Pick a question in your area of knowledge and write a detailed answer.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-money-bill-wave"></i></div>
+        <h3>Get Paid</h3>
+        <p>Earn money for every approved answer. Withdraw when you reach 5,000 KSH.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registration -->
+  <section class="form-section" id="registerForm" style="display:none;">
+    <div class="form-container">
+      <h2>Register</h2>
+      <form id="registrationForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>National ID</label>
+          <input type="number" id="idNumber" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input type="date" id="dob" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Highest Education</label>
+          <select id="education" class="form-control">
+            <option>Bachelor’s</option>
+            <option>Diploma</option>
+            <option>Master’s</option>
+            <option>PhD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Years of Writing Experience</label>
+          <input type="number" id="experience" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <input type="checkbox" required> I agree to the <a href="#" style="color: var(--primary);">Terms and Conditions</a>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;border:none;">Submit</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Answerlytica. Built to empower writers and learners.</p>
+  </footer>
+
+  <!-- Supabase & JS Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "YOUR_SUPABASE_URL";
+    const supabaseKey = "YOUR_SUPABASE_ANON_KEY";
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById('registrationForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const { data, error } = await supabase.from('profiles').insert([
+        {
+          name: document.getElementById('fullName').value,
+          id_number: document.getElementById('idNumber').value,
+          dob: document.getElementById('dob').value,
+          email: document.getElementById('email').value,
+          education: document.getElementById('education').value,
+          experience_years: document.getElementById('experience').value
+        }
+      ]);
+
+      if (error) alert('❌ Registration failed: ' + error.message);
+      else alert('✅ Registration successful!');
+    });
+  </script>
+</body>
+</html>
