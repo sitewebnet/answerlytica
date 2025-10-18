@@ -3,270 +3,617 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Answerlytica Dashboard</title>
-  <link rel="icon" href="https://img.icons8.com/ios-filled/50/4a90e2/graduation-cap.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --primary:#4361ee;
-      --primary-light:#5e7bff;
-      --bg:#f3f6fc;
-      --card:#ffffff;
-      --border:#e2e8f0;
-      --muted:#6c757d;
-      --radius:16px;
-      --transition:all 0.3s ease;
-    }
+  <title>Answerlytica — Dashboard</title>
 
-    *{box-sizing:border-box;font-family:'Poppins',sans-serif;}
-    body{margin:0;background:var(--bg);color:#1e1e2f;overflow-x:hidden;}
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --g1: #0f172a;   /* deep navy */
+      --g2: #1e3c72;   /* mid blue */
+      --g3: #2a5298;   /* lighter blue */
+      --glass: rgba(255,255,255,0.08);
+      --card: rgba(255,255,255,0.95);
+      --accent: #4361ee;
+      --muted: #9aa3b2;
+      --radius: 14px;
+      --shadow: 0 8px 30px rgba(11,21,45,0.25);
+      --ease: cubic-bezier(.2,.9,.3,1);
+    }
+    /* Reset */
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      min-height:100vh;
+      background: linear-gradient(180deg,var(--g1), var(--g2), var(--g3));
+      color: #0b1b2b;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
 
     /* Layout */
     .app{display:flex;min-height:100vh;}
-    .sidebar{
-      width:260px;background:linear-gradient(180deg,#4361ee,#5e7bff);
-      padding:24px;position:fixed;left:0;top:0;bottom:0;
-      transition:var(--transition);z-index:999;
-      box-shadow:2px 0 12px rgba(0,0,0,0.1);
+    /* SIDEBAR (desktop) */
+    .sidebar {
+      width:260px;
+      padding:28px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-right: 1px solid rgba(255,255,255,0.04);
+      position:fixed;
+      left:0;top:0;bottom:0;
+      display:flex;flex-direction:column;gap:18px;
+      transition: transform 360ms var(--ease), box-shadow 360ms var(--ease);
+      z-index:90;
+      backdrop-filter: blur(6px);
     }
-    .sidebar.collapsed{transform:translateX(-100%);}
-    .logo{font-size:1.4rem;color:#fff;font-weight:600;text-align:center;margin-bottom:32px;}
-    .nav{list-style:none;padding:0;margin:0;}
-    .nav li{margin-bottom:10px;}
-    .nav a{
-      display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius);
-      color:#fff;text-decoration:none;opacity:0.9;transition:var(--transition);
+    .brand{
+      display:flex;gap:12px;align-items:center;
+      color: white;font-weight:700;font-size:1.1rem;
     }
-    .nav a:hover,.nav a.active{background:rgba(255,255,255,0.15);opacity:1;}
+    .brand .logo {
+      width:42px;height:42px;border-radius:10px;background:linear-gradient(90deg,#6fa8ff,#3b66ff);
+      display:flex;align-items:center;justify-content:center;color:white;font-size:18px;
+      box-shadow: 0 6px 18px rgba(10,30,80,0.35);
+    }
+    .nav { list-style:none; padding:0; margin-top:8px; display:flex;flex-direction:column; gap:8px; }
+    .nav a {
+      display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;color:rgba(255,255,255,0.95);
+      text-decoration:none;font-weight:600; transition: transform 200ms var(--ease), background 200ms var(--ease);
+      background: transparent;border: 1px solid transparent;
+    }
+    .nav a:hover { transform: translateX(6px); background: rgba(255,255,255,0.04); }
+    .nav a.active { background: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03); }
 
-    /* Main content */
-    .main{margin-left:260px;flex:1;padding:24px;transition:var(--transition);}
-    @media(max-width:768px){.main{margin-left:0;}}
+    .sidebar .meta { color: var(--muted); font-size:0.9rem; margin-top:auto; }
 
-    /* Header */
-    header{
-      position:sticky;top:0;z-index:10;background:var(--card);
-      padding:14px 20px;border-radius:var(--radius);
+    /* MAIN area */
+    .main {
+      margin-left: 280px;
+      flex:1;
+      padding:20px;
+      min-height:100vh;
+      transition: margin-left 360ms var(--ease);
+    }
+
+    /* Sticky header */
+    header.appbar {
+      position: sticky; top: 18px;
       display:flex;justify-content:space-between;align-items:center;
-      box-shadow:0 2px 10px rgba(0,0,0,0.05);
-      margin-bottom:24px;
+      gap:12px;padding:14px 18px;border-radius:12px;background: rgba(255,255,255,0.06);
+      color: white;box-shadow:0 8px 30px rgba(2,6,23,0.35);
+      backdrop-filter: blur(8px); margin-bottom:18px;
+      transition: transform 260ms var(--ease);
     }
-    .menu-btn{display:none;font-size:1.4rem;color:var(--primary);cursor:pointer;}
-    @media(max-width:768px){.menu-btn{display:block;}}
-
-    .user-info{display:flex;align-items:center;gap:12px;}
-    .user-email{color:var(--primary);font-weight:500;}
-    .logout-btn{
-      background:linear-gradient(90deg,#4361ee,#5e7bff);
-      color:white;border:none;padding:8px 14px;border-radius:10px;
-      cursor:pointer;transition:var(--transition);
+    .appbar .left { display:flex; align-items:center; gap:14px; }
+    .hamburger {
+      display:none; width:44px; height:44px; border-radius:10px; background: linear-gradient(90deg,#ffffff11,#ffffff06);
+      align-items:center; justify-content:center; color:white; cursor:pointer; border:1px solid rgba(255,255,255,0.03);
     }
-    .logout-btn:hover{opacity:0.9;}
+    .title { color:white; font-weight:700; font-size:1.05rem; }
 
-    /* Sections */
-    .section{display:none;animation:fadeIn 0.5s ease;}
-    .section.active{display:block;}
-
-    @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
-    /* Cards */
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
-    .card{
-      background:var(--card);padding:20px;border-radius:var(--radius);
-      box-shadow:0 4px 10px rgba(0,0,0,0.05);
-      text-align:center;transition:var(--transition);
-    }
-    .card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,0.08);}
-    .card h3{margin:0 0 6px;color:var(--primary);}
-    .card p{margin:0;font-weight:600;font-size:1.2rem;}
-
-    /* Upgrade / Withdraw cards */
-    .glass-card{
-      background:rgba(255,255,255,0.8);
-      border:1px solid rgba(255,255,255,0.2);
-      backdrop-filter:blur(10px);
-      border-radius:var(--radius);
-      padding:24px;
-      box-shadow:0 4px 16px rgba(67,97,238,0.15);
-      animation:fadeIn 0.6s ease;
+    .user-row { display:flex;align-items:center;gap:12px }
+    .user-email { color: white; font-weight:600; background: rgba(255,255,255,0.05); padding:8px 12px; border-radius:10px; }
+    .logout-btn {
+      background: white; color: var(--g2); padding:8px 12px; border-radius:10px; border:0; font-weight:600; cursor:pointer;
+      box-shadow: 0 6px 18px rgba(5,20,70,0.2);
     }
 
-    input,button{
-      font-size:1rem;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      width:100%;
-      margin-top:10px;
-      transition:var(--transition);
+    /* Cards & sections */
+    .container {
+      max-width:1100px; margin:0 auto;
     }
-    button{
-      background:linear-gradient(90deg,#4361ee,#5e7bff);
-      color:white;border:none;cursor:pointer;font-weight:500;
+    .cards {
+      display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:18px;
     }
-    button:hover{opacity:0.9;}
-    input:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 2px rgba(67,97,238,0.1);}
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));
+      padding:18px;border-radius:12px;color:#0b1b2b; box-shadow: var(--shadow);
+      transition: transform 240ms var(--ease);
+    }
+    .card:hover { transform: translateY(-6px); }
+    .card h4 { margin:0; color:var(--g2); font-size:0.95rem; }
+    .card .big { font-weight:700; font-size:1.25rem; margin-top:8px; }
 
-    /* Withdraw section extras */
-    .progress-bar{
-      height:8px;background:var(--border);
-      border-radius:10px;overflow:hidden;margin-top:12px;
-    }
-    .progress-bar span{
-      display:block;height:100%;background:linear-gradient(90deg,#4361ee,#5e7bff);
-      width:0%;transition:width 1s ease;
+    .section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));
+      border-radius:12px; padding:18px; box-shadow: var(--shadow);
+      overflow:visible;
     }
 
-    .status-text{color:var(--muted);margin-top:10px;font-size:0.9rem;}
+    /* question list */
+    .question {
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding:14px;border-radius:10px;border:1px solid rgba(10,20,45,0.04); background: white;
+      transition: transform 200ms var(--ease);
+    }
+    .question:hover{transform:translateY(-4px)}
+    .q-left { flex:1 }
+    .q-title { font-weight:700; color:#0b1b2b; }
+    .q-meta { color:var(--muted); font-size:0.9rem; margin-top:6px; }
+
+    .actions { min-width:150px; text-align:right; display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+
+    /* upgrade & withdraw UI */
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.06); color:white;
+    }
+    .glass h3{color:white;margin:0}
+    .glass p{color:rgba(255,255,255,0.9);margin-top:8px}
+
+    .input {
+      display:flex; gap:8px; align-items:center; margin-top:12px;
+    }
+    .input input {
+      flex:1; padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color:white;
+    }
+    .input button { padding:10px 14px; border-radius:10px; background: white; color: var(--g2); border:0; font-weight:700; cursor:pointer; }
+
+    .progress {
+      height:10px; background: rgba(255,255,255,0.07); border-radius:999px; overflow:hidden; margin-top:12px;
+    }
+    .progress > span { display:block; height:100%; background: linear-gradient(90deg,#86a8ff,#4361ee); width:0%; transition: width 900ms cubic-bezier(.2,.9,.3,1); }
+
+    /* Modal */
+    .modal {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9999;
+      background: linear-gradient(0deg, rgba(2,6,23,0.6), rgba(2,6,23,0.6));
+    }
+    .modal.open { display:flex; }
+    .modal-card {
+      width:94%; max-width:720px; border-radius:12px; padding:18px;
+      background: linear-gradient(180deg, #ffffff, #fbfdff); box-shadow: 0 18px 60px rgba(3,10,38,0.6);
+    }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .close-btn { background:transparent;border:0;font-size:20px;cursor:pointer;color:#172034 }
+
+    /* small screens / drawer */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-120%); position:fixed; }
+      .sidebar.open { transform: translateX(0%); box-shadow: 12px 0 40px rgba(0,0,0,0.6) }
+      .main { margin-left:0; padding:16px; }
+      .appbar { margin:0; border-radius:10px; padding:12px; }
+      .brand { display:flex; gap:10px; align-items:center; }
+      .nav a { font-size:15px; padding:12px 14px; }
+      .hamburger { display:flex; }
+    }
+
+    /* very small phones: ensure stacked layout */
+    @media (max-width:420px) {
+      .cards { grid-template-columns: 1fr; }
+      header.appbar { padding: 10px; }
+    }
+
+    /* small utility */
+    .muted { color:var(--muted); font-size:0.9rem }
+    .btn-ghost { background: transparent; color: var(--g2); border: 1px solid rgba(255,255,255,0.12); padding:8px 12px; border-radius:10px; cursor:pointer;}
   </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="logo"><i class="fas fa-graduation-cap"></i> Answerlytica</div>
-    <ul class="nav">
-      <li><a href="#" data-section="overview" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
-      <li><a href="#" data-section="available"><i class="fas fa-question-circle"></i> Available</a></li>
-      <li><a href="#" data-section="myanswers"><i class="fas fa-file-alt"></i> My Answers</a></li>
-      <li><a href="#" data-section="upgrade"><i class="fas fa-arrow-up"></i> Upgrade</a></li>
-      <li><a href="#" data-section="withdraw"><i class="fas fa-money-bill-wave"></i> Withdraw</a></li>
-    </ul>
-  </aside>
-
-  <main class="main">
-    <header>
-      <i class="fas fa-bars menu-btn" id="menuBtn"></i>
-      <div class="user-info">
-        <div class="user-email" id="userEmail">Loading...</div>
-        <button class="logout-btn" id="logoutBtn">Logout</button>
+  <div class="app">
+    <!-- SIDEBAR (drawer on small screens) -->
+    <aside class="sidebar" id="sidebar" aria-hidden="false">
+      <div class="brand">
+        <div class="logo"><i class="fas fa-graduation-cap"></i></div>
+        <div>Answerlytica</div>
       </div>
-    </header>
 
-    <!-- Overview -->
-    <section id="overview" class="section active">
-      <div class="cards">
-        <div class="card"><h3>Balance</h3><p id="balance">0 KSH</p></div>
-        <div class="card"><h3>Limit</h3><p id="qLimit">1/day</p></div>
-        <div class="card"><h3>Status</h3><p id="accountStatus">pending</p></div>
+      <nav>
+        <ul class="nav" role="menu">
+          <li><a href="#" data-section="overview" class="active"><i class="fas fa-chart-line"></i> Overview</a></li>
+          <li><a href="#" data-section="available"><i class="fas fa-question-circle"></i> Available</a></li>
+          <li><a href="#" data-section="myanswers"><i class="fas fa-file-alt"></i> My Answers</a></li>
+          <li><a href="#" data-section="upgrade"><i class="fas fa-arrow-up"></i> Upgrade</a></li>
+          <li><a href="#" data-section="withdraw"><i class="fas fa-money-bill-wave"></i> Withdraw</a></li>
+        </ul>
+      </nav>
+
+      <div class="meta muted">
+        <div>Till: <strong style="color:#fff">1234567</strong></div>
+        <div style="margin-top:8px">Need help? contact admin</div>
       </div>
-    </section>
+    </aside>
 
-    <!-- Available Questions -->
-    <section id="available" class="section">
-      <h2>Available Questions</h2>
-      <div id="questionsContainer"></div>
-    </section>
+    <!-- MAIN -->
+    <main class="main">
+      <header class="appbar" role="banner">
+        <div class="left">
+          <div class="hamburger" id="hamburger" title="Menu"><i class="fas fa-bars"></i></div>
+          <div class="title muted">Welcome to Answerlytica</div>
+        </div>
 
-    <!-- My Answers -->
-    <section id="myanswers" class="section">
-      <h2>My Answers</h2>
-      <div id="myAnswersContainer"></div>
-    </section>
+        <div class="user-row">
+          <div id="userEmail" class="user-email">loading...</div>
+          <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i>&nbsp;Logout</button>
+        </div>
+      </header>
 
-    <!-- Upgrade -->
-    <section id="upgrade" class="section">
-      <div class="glass-card">
-        <h2>Upgrade Account</h2>
-        <p>Pay <strong>500 KSH</strong> to unlock up to <strong>3 questions per day</strong>.</p>
-        <p><strong>Till Number: 1234567</strong></p>
-        <p>After payment, send your <strong>M-Pesa reference code</strong> to the admin below:</p>
-        <input type="text" id="mpesaRef" placeholder="Enter M-Pesa reference code (e.g. QJD3F7X)" />
-        <button id="sendRefBtn"><i class="fas fa-paper-plane"></i> Send Reference Code</button>
-        <div id="paymentStatus" class="status-text"></div>
+      <div class="container">
+        <!-- OVERVIEW -->
+        <section id="overview" class="section active">
+          <div class="cards">
+            <div class="card">
+              <h4>Balance</h4>
+              <div class="big" id="balance">0 KSH</div>
+              <div class="muted" style="margin-top:8px">Approved earnings available</div>
+            </div>
+
+            <div class="card">
+              <h4>Question Limit</h4>
+              <div class="big" id="qLimit">1 / day</div>
+              <div class="muted" style="margin-top:8px">Upgrade to 3/day</div>
+            </div>
+
+            <div class="card">
+              <h4>Account Status</h4>
+              <div class="big" id="accountStatus">pending</div>
+              <div class="muted" style="margin-top:8px">Admin approval controls some features</div>
+            </div>
+          </div>
+
+          <div class="section" style="margin-top:8px; padding:12px;">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+              <button id="startAnswer" class="btn-ghost"><i class="fas fa-pen"></i>&nbsp; Start Answering</button>
+              <button id="openAnswers" class="btn-ghost"><i class="fas fa-folder-open"></i>&nbsp; My Answers</button>
+              <button id="openAvailable" class="btn-ghost"><i class="fas fa-list"></i>&nbsp; Available</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- AVAILABLE QUESTIONS -->
+        <section id="available" class="section">
+          <h3 style="margin-bottom:12px;color:#fff">Available Questions</h3>
+          <div id="questionsContainer"></div>
+        </section>
+
+        <!-- MY ANSWERS -->
+        <section id="myanswers" class="section">
+          <h3 style="margin-bottom:12px;color:#0b1b2b">My Submitted Answers</h3>
+          <div id="myAnswersContainer"></div>
+        </section>
+
+        <!-- UPGRADE -->
+        <section id="upgrade" class="section">
+          <div class="glass">
+            <h3>Upgrade Account</h3>
+            <p>Pay <strong>500 KSH</strong> to unlock up to <strong>3 questions/day</strong>.</p>
+            <div class="input">
+              <input id="mpesaRef" placeholder="Enter M-Pesa reference code (e.g. QJD3F7X)" aria-label="M-Pesa reference code">
+              <button id="sendRefBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="muted" id="paymentStatus" style="margin-top:10px"></div>
+          </div>
+        </section>
+
+        <!-- WITHDRAW -->
+        <section id="withdraw" class="section">
+          <div class="glass">
+            <h3>Withdraw Earnings</h3>
+            <p class="muted">Request a withdrawal to your M-Pesa number. Minimum <strong>5,000 KSH</strong></p>
+
+            <div style="margin-top:12px">
+              <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+              <div class="muted" style="margin-top:8px">Progress to minimum: <span id="progressText">0/5000 KSH</span></div>
+            </div>
+
+            <div class="input" style="margin-top:14px">
+              <input id="mpesaPhone" placeholder="M-Pesa phone (07XXXXXXXX)" aria-label="M-Pesa phone">
+              <button id="withdrawBtn"><i class="fas fa-wallet"></i></button>
+            </div>
+
+            <div class="muted" id="withdrawMessage" style="margin-top:12px"></div>
+          </div>
+        </section>
       </div>
-    </section>
+    </main>
+  </div>
 
-    <!-- Withdraw -->
-    <section id="withdraw" class="section">
-      <div class="glass-card">
-        <h2>Withdraw Earnings</h2>
-        <p>Balance must be at least <strong>5000 KSH</strong> to withdraw.</p>
-        <div class="progress-bar"><span id="progressBar"></span></div>
-        <input id="mpesaPhone" type="tel" placeholder="M-Pesa phone (07XXXXXXXX)">
-        <button id="withdrawBtn"><i class="fas fa-wallet"></i> Request Withdraw</button>
-        <div id="withdrawMessage" class="status-text"></div>
+  <!-- Submit Answer Modal -->
+  <div class="modal" id="submitModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <strong>Submit Answer (PDF)</strong>
+        <button class="close-btn" id="closeModal"><i class="fas fa-times"></i></button>
       </div>
-    </section>
-  </main>
-</div>
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabaseUrl = "https://bftwskejmvopnpcdgmua.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU";
-const supabase = createClient(supabaseUrl, supabaseKey);
+      <div>
+        <div id="modalQuestionText" style="font-weight:700;margin-bottom:8px"></div>
+        <div class="muted">Upload a PDF (max 10MB). Your submission will be marked pending until admin reviews.</div>
+        <div style="margin-top:12px">
+          <input type="file" accept="application/pdf" id="answerFile" />
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button id="submitAnswerBtn" style="flex:1;background:linear-gradient(90deg,#4361ee,#5e7bff);color:white;padding:10px;border-radius:10px;border:0">Submit Answer</button>
+            <button id="cancelAnswerBtn" class="btn-ghost" style="flex:0 0 120px">Cancel</button>
+          </div>
+          <div class="muted" id="submitFeedback" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-// Auth check
-const { data: { user } } = await supabase.auth.getUser();
-if (!user) window.location.href = "index.html";
-document.getElementById("userEmail").textContent = user.email;
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Load user profile
-let { data: profile } = await supabase.from("profiles").select("*").eq("email", user.email).single();
-document.getElementById("balance").textContent = (profile.balance || 0) + " KSH";
-document.getElementById("qLimit").textContent = profile.upgraded ? "3/day" : "1/day";
-document.getElementById("accountStatus").textContent = profile.status || "pending";
+    // ------------------ CONFIG ------------------
+    // Use your project URL (already set) and replace the anon key placeholder with your anon key
+    const SUPABASE_URL = "https://bftwskejmvopnpcdgmua.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU"; // ← REPLACE with your anon key
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Sidebar toggle
-const sidebar = document.getElementById("sidebar");
-document.getElementById("menuBtn").onclick = () => sidebar.classList.toggle("collapsed");
+    // ------------------ UI refs ------------------
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.querySelectorAll('.nav a');
+    const sections = document.querySelectorAll('.section');
+    const userEmailEl = document.getElementById('userEmail');
+    const balanceEl = document.getElementById('balance');
+    const qLimitEl = document.getElementById('qLimit');
+    const accountStatusEl = document.getElementById('accountStatus');
+    const questionsContainer = document.getElementById('questionsContainer');
+    const myAnswersContainer = document.getElementById('myAnswersContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const paymentStatus = document.getElementById('paymentStatus');
+    const withdrawMessage = document.getElementById('withdrawMessage');
+    const submitModal = document.getElementById('submitModal');
+    const modalQuestionText = document.getElementById('modalQuestionText');
+    const answerFile = document.getElementById('answerFile');
+    const submitFeedback = document.getElementById('submitFeedback');
 
-// Section switching
-document.querySelectorAll(".nav a").forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    document.querySelectorAll(".nav a").forEach(x => x.classList.remove("active"));
-    link.classList.add("active");
-    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-    const sectionId = link.dataset.section;
-    document.getElementById(sectionId).classList.add("active");
-    localStorage.setItem("activeSection", sectionId);
-  });
-});
+    // state
+    let user = null;
+    let profile = null;
+    let questions = [];
+    let currentQuestionId = null;
 
-// Restore active section
-window.addEventListener("load", () => {
-  const last = localStorage.getItem("activeSection") || "overview";
-  document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-  document.getElementById(last).classList.add("active");
-  document.querySelectorAll(".nav a").forEach(a => a.classList.remove("active"));
-  document.querySelector(`.nav a[data-section="${last}"]`)?.classList.add("active");
-});
+    // ------------------ helpers ------------------
+    function showSidebar(open){
+      if(open) sidebar.classList.add('open'); else sidebar.classList.remove('open');
+    }
+    function setActiveSection(id){
+      // UI set
+      navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+      sections.forEach(s=>s.classList.toggle('active', s.id===id));
+      // save
+      localStorage.setItem('activeSection', id);
+      // collapse drawer on mobile
+      if(window.innerWidth <= 900) showSidebar(false);
+    }
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+    function escapeHtml(s){ if(!s && s !== 0) return ""; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
 
-// Update progress bar
-const balance = profile.balance || 0;
-const percent = Math.min((balance / 5000) * 100, 100);
-document.getElementById("progressBar").style.width = percent + "%";
+    // ------------------ Auth & initial load ------------------
+    async function init(){
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if(!u) { location.href = 'index.html'; return; }
+      user = u;
+      userEmailEl.textContent = user.email;
 
-// Send M-Pesa reference
-document.getElementById("sendRefBtn").onclick = async () => {
-  const ref = document.getElementById("mpesaRef").value.trim();
-  if (!ref) return alert("Enter your M-Pesa reference code");
-  const { error } = await supabase.from("payments").insert([
-    { user_id: profile.id, amount: 500, ref_code: ref, status: "pending" }
-  ]);
-  if (error) return alert("Error: " + error.message);
-  document.getElementById("paymentStatus").textContent = "✅ Reference sent! Admin will confirm soon.";
-};
+      // load profile
+      const { data, error } = await supabase.from('profiles').select('*').eq('email', user.email).single();
+      if(error || !data){
+        console.error('Profile load error', error);
+        alert('Could not load profile. Contact admin.');
+        return;
+      }
+      profile = data;
+      renderProfile();
 
-// Withdraw request
-document.getElementById("withdrawBtn").onclick = async () => {
-  const phone = document.getElementById("mpesaPhone").value.trim();
-  if (balance < 5000) return alert("Your balance is below 5000 KSH.");
-  if (!phone) return alert("Enter your M-Pesa number.");
-  const { error } = await supabase.from("payments").insert([
-    { user_id: profile.id, amount: -balance, ref_code: phone, status: "withdraw_requested" }
-  ]);
-  if (error) return alert("Error: " + error.message);
-  document.getElementById("withdrawMessage").textContent = "✅ Withdrawal requested to " + phone;
-};
+      // load questions + my answers
+      await loadQuestions();
+      await loadMyAnswers();
+      updateProgress();
 
-// Logout
-document.getElementById("logoutBtn").onclick = async () => {
-  await supabase.auth.signOut();
-  window.location.href = "index.html";
-};
-</script>
+      // restore section
+      const last = localStorage.getItem('activeSection') || 'overview';
+      setActiveSection(last);
+    }
+
+    function renderProfile(){
+      balanceEl.textContent = (profile.balance || 0) + ' KSH';
+      qLimitEl.textContent = profile.upgraded ? '3 / day' : '1 / day';
+      accountStatusEl.textContent = profile.status || 'pending';
+    }
+
+    // ------------------ QUESTIONS ------------------
+    async function loadQuestions(){
+      const { data: qs, error } = await supabase.from('questions').select('*').order('created_at', { ascending:false });
+      if(error){ console.error('questions err', error); questionsContainer.innerHTML='<div class="muted">Could not load questions.</div>'; return; }
+      questions = qs || [];
+      if(questions.length===0) { questionsContainer.innerHTML = '<div class="muted">No questions yet.</div>'; return; }
+
+      questionsContainer.innerHTML = '';
+      for(const q of questions){
+        const el = document.createElement('div');
+        el.className = 'question';
+        el.innerHTML = `
+          <div class="q-left">
+            <div class="q-title">${escapeHtml(q.question_text)}</div>
+            <div class="q-meta">Pay: <strong>${q.pay_amount} KSH</strong> • Added: ${new Date(q.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-ghost view-btn" data-id="${q.id}">View</button>
+            <button class="btn-ghost answer-btn" data-id="${q.id}">Answer</button>
+          </div>
+        `;
+        questionsContainer.appendChild(el);
+      }
+
+      // attach handlers
+      questionsContainer.querySelectorAll('.answer-btn').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const id = parseInt(b.dataset.id);
+          openSubmitModal(id);
+        });
+      });
+      questionsContainer.querySelectorAll('.view-btn').forEach(b=>{
+        b.addEventListener('click', async ()=>{
+          const id = parseInt(b.dataset.id);
+          const { data } = await supabase.from('questions').select('*').eq('id', id).single();
+          alert(data.question_text + "\\n\\nPay: " + data.pay_amount + " KSH");
+        });
+      });
+    }
+
+    // ------------------ MY ANSWERS ------------------
+    async function loadMyAnswers(){
+      const { data: ans, error } = await supabase.from('answers').select('id, question_id, file_url, status, created_at').eq('user_email', user.email).order('created_at', { ascending:false });
+      if(error){ console.error('answers err', error); myAnswersContainer.innerHTML = '<div class="muted">Could not load answers.</div>'; return; }
+      if(!ans || ans.length===0){ myAnswersContainer.innerHTML = '<div class="muted">You have not submitted any answers yet.</div>'; return; }
+
+      myAnswersContainer.innerHTML = '';
+      for(const a of ans){
+        const q = questions.find(x=>x.id===a.question_id);
+        const node = document.createElement('div');
+        node.className = 'question';
+        node.innerHTML = `
+          <div class="q-left">
+            <div class="q-title">${escapeHtml(q?.question_text || 'Question #' + a.question_id)}</div>
+            <div class="q-meta">Status: <strong>${escapeHtml(a.status)}</strong> • Submitted: ${new Date(a.created_at).toLocaleString()}</div>
+          </div>
+          <div class="actions">
+            <a class="btn-ghost" href="${a.file_url}" target="_blank" rel="noopener">View PDF</a>
+          </div>
+        `;
+        myAnswersContainer.appendChild(node);
+      }
+    }
+
+    // ------------------ SUBMIT ANSWER (modal, storage, insert) ------------------
+    function openSubmitModal(questionId){
+      // check daily limit
+      const limit = profile.upgraded ? 3 : 1;
+      const today = todayISO();
+      if(profile.last_answer_date === today && (profile.answers_today || 0) >= limit){
+        return alert(`You have reached your daily limit (${limit}). Upgrade to answer more.`);
+      }
+      currentQuestionId = questionId;
+      const q = questions.find(x=>x.id===questionId);
+      modalQuestionText.textContent = q ? q.question_text : ('Question #' + questionId);
+      submitFeedback.textContent = '';
+      answerFile.value = '';
+      submitModal.classList.add('open');
+      submitModal.setAttribute('aria-hidden','false');
+    }
+
+    document.getElementById('closeModal').addEventListener('click', ()=>{ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true');});
+    document.getElementById('cancelAnswerBtn').addEventListener('click', ()=>{ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); });
+
+    document.getElementById('submitAnswerBtn').addEventListener('click', async ()=>{
+      submitFeedback.textContent = '';
+      const file = answerFile.files[0];
+      if(!file) return submitFeedback.textContent = 'Please select a PDF.';
+      if(file.type !== 'application/pdf') return submitFeedback.textContent = 'Only PDF allowed.';
+      if(file.size > 10 * 1024 * 1024) return submitFeedback.textContent = 'Max 10MB allowed.';
+      if(!currentQuestionId) return submitFeedback.textContent = 'No question selected.';
+
+      try{
+        // upload
+        const safeEmail = user.email.replace(/[@.]/g,'_');
+        const path = `${safeEmail}/${Date.now()}_${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage.from('answers').upload(path, file);
+        if(uploadError){ console.error(uploadError); alert('Upload failed: '+uploadError.message); return; }
+
+        // create signed url (optional)
+        const { data: signed } = await supabase.storage.from('answers').createSignedUrl(path, 60*60); // 1 hour
+
+        // insert answers row
+        const { error: insertErr } = await supabase.from('answers').insert([{
+          user_email: user.email,
+          question_id: currentQuestionId,
+          file_url: signed.signedUrl,
+          status: 'pending'
+        }]);
+        if(insertErr){ console.error(insertErr); alert('Save failed: '+insertErr.message); return; }
+
+        // update profile counters (last_answer_date + answers_today)
+        const today = todayISO();
+        let newCount = 1;
+        if(profile.last_answer_date === today) newCount = (profile.answers_today || 0) + 1;
+        const { error: updErr } = await supabase.from('profiles').update({ last_answer_date: today, answers_today: newCount }).eq('id', profile.id);
+        if(!updErr){
+          profile.last_answer_date = today;
+          profile.answers_today = newCount;
+        }
+
+        alert('Answer submitted — pending admin review.');
+        submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true');
+        await loadMyAnswers();
+
+      }catch(err){
+        console.error(err); alert('Submission failed.');
+      }
+    });
+
+    // ------------------ UPGRADE (send ref code) ------------------
+    document.getElementById('sendRefBtn').addEventListener('click', async ()=>{
+      const ref = document.getElementById('mpesaRef').value.trim();
+      if(!ref) return alert('Enter M-Pesa reference code.');
+      const { error } = await supabase.from('payments').insert([{ user_id: profile.id, amount: 500, ref_code: ref, status: 'pending' }]);
+      if(error){ console.error(error); alert('Failed: '+error.message); return; }
+      paymentStatus.textContent = 'Reference sent — admin will confirm.';
+      alert('Reference sent.');
+    });
+
+    // ------------------ WITHDRAW ------------------
+    function updateProgress(){
+      const bal = Number(profile.balance || 0);
+      const percent = Math.min(Math.round((bal / 5000) * 100), 100);
+      progressBar.style.width = percent + '%';
+      progressText.textContent = `${bal}/5000 KSH`;
+    }
+
+    document.getElementById('withdrawBtn').addEventListener('click', async ()=>{
+      const bal = Number(profile.balance || 0);
+      if(bal < 5000) return alert('You need at least 5000 KSH to withdraw.');
+      const phone = document.getElementById('mpesaPhone').value.trim();
+      if(!phone) return alert('Enter your M-Pesa phone number.');
+      const { error } = await supabase.from('payments').insert([{ user_id: profile.id, amount: -bal, ref_code: phone, status: 'withdraw_requested' }]);
+      if(error){ console.error(error); alert('Failed: '+error.message); return; }
+      withdrawMessage.textContent = 'Withdrawal requested — admin will process.';
+      alert('Withdrawal requested.');
+    });
+
+    // ------------------ NAV events ------------------
+    navLinks.forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const id = a.dataset.section;
+        setActiveSection(id);
+      });
+    });
+    document.getElementById('openAvailable').addEventListener('click', ()=> setActiveSection('available'));
+    document.getElementById('openAnswers').addEventListener('click', ()=> setActiveSection('myanswers'));
+    document.getElementById('startAnswer').addEventListener('click', ()=> {
+      if(questions.length) openSubmitModal(questions[0].id);
+      else alert('No questions available yet.');
+      setActiveSection('available');
+    });
+
+    // sidebar drawer control
+    hamburger.addEventListener('click', ()=> sidebar.classList.toggle('open'));
+    // if user clicks outside sidebar on small screen, close drawer
+    window.addEventListener('click', (e)=>{
+      if(window.innerWidth <= 900){
+        const isClickInside = sidebar.contains(e.target) || hamburger.contains(e.target);
+        if(!isClickInside) sidebar.classList.remove('open');
+      }
+    });
+
+    // logout handler
+    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+      await supabase.auth.signOut();
+      location.href = 'index.html';
+    });
+
+    // start everything
+    await init();
+
+    // reactive: update progress if profile changes in page (not automatic from DB)
+    updateProgress();
+  </script>
 </body>
 </html>
