@@ -1,300 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Answerlytica</title>
   <link rel="icon" href="https://img.icons8.com/ios-filled/50/4a90e2/graduation-cap.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
-    :root {
-      --primary: #4361ee;
-      --light-bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --gray: #6c757d;
-      --border: #dee2e6;
+    :root{
+      --primary:#4361ee;
+      --muted:#6c757d;
+      --bg:#f8f9fa;
+      --card:#ffffff;
+      --border:#e9ecef;
     }
-
-    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-
-    body {
-      background-color: var(--light-bg);
-      display: flex;
-      min-height: 100vh;
-      color: #212529;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 250px;
-      background: white;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-      padding: 1.5rem 1rem;
-      position: fixed;
-      top: 0; bottom: 0;
-      transition: all 0.3s ease;
-    }
-
-    .logo {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-
-    .nav-links {
-      list-style: none;
-    }
-
-    .nav-links li {
-      margin-bottom: 1rem;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--gray);
-      font-weight: 500;
-      display: block;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
-
-    .nav-links a:hover, .nav-links a.active {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* Main content */
-    .main-content {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      padding: 1rem 2rem;
-    }
-
-    header {
-      background: white;
-      padding: 1rem 2rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border-radius: 10px;
-      margin-bottom: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header .user-info {
-      font-weight: 500;
-      color: var(--primary);
-    }
-
-    .logout-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .logout-btn:hover {
-      background: #3146c8;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      text-align: center;
-    }
-
-    .card h3 { color: var(--primary); margin-bottom: 0.5rem; }
-    .card p { font-size: 1.2rem; font-weight: 600; }
-
-    /* Section container */
-    .section {
-      display: none;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .section.active { display: block; }
-
-    .question, .answer {
-      background: var(--light-bg);
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-    }
-
-    .btn {
-      display: inline-block;
-      background: var(--primary);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: 0.3s;
-    }
-
-    .btn:hover { background: #3146c8; }
-
-    @media (max-width: 768px) {
-      .sidebar { position: fixed; left: -250px; }
-      .sidebar.active { left: 0; }
-      .main-content { margin-left: 0; width: 100%; }
-    }
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif;}
+    body{margin:0;background:var(--bg);color:#212529}
+    .app{display:flex;min-height:100vh;}
+    .sidebar{width:260px;background:var(--card);padding:24px;box-shadow:2px 0 10px rgba(0,0,0,0.04);position:fixed;left:0;top:0;bottom:0;}
+    .logo{font-size:1.25rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:18px}
+    .nav{list-style:none;padding:0;margin:0}
+    .nav li{margin-bottom:8px}
+    .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:var(--muted);text-decoration:none;transition:all .15s;}
+    .nav a.active,.nav a:hover{background:var(--primary);color:white;}
+    .main{margin-left:260px;padding:22px;flex:1;}
+    header{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:18px;}
+    .user-email{color:var(--primary);font-weight:600;}
+    .logout-btn{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:18px;}
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);text-align:center;}
+    .card h3{margin:0 0 6px 0;color:var(--primary);font-size:0.95rem;}
+    .card p{margin:0;font-size:1.25rem;font-weight:600;}
+    .section{display:none;background:var(--card);padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .section.active{display:block;}
+    .question,.answer{border:1px solid var(--border);background:#fff;padding:14px;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;}
+    .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn.secondary{background:#6c757d}
+    .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--border)}
+    input[type=text],input[type=tel]{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)}
+    .small{font-size:0.85rem;color:var(--muted)}
   </style>
 </head>
-
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
+<div class="app">
+  <aside class="sidebar">
     <div class="logo"><i class="fas fa-graduation-cap"></i> Answerlytica</div>
-    <ul class="nav-links">
-      <li><a href="#" class="active" data-section="dashboard">🏠 Dashboard</a></li>
-      <li><a href="#" data-section="questions">📋 Available Questions</a></li>
-      <li><a href="#" data-section="answers">✅ My Answers</a></li>
-      <li><a href="#" data-section="upgrade">💳 Upgrade</a></li>
-      <li><a href="#" data-section="withdraw">💰 Withdraw</a></li>
+    <ul class="nav">
+      <li><a href="#" data-section="overview" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
+      <li><a href="#" data-section="available"><i class="fas fa-question-circle"></i> Available</a></li>
+      <li><a href="#" data-section="myanswers"><i class="fas fa-file-alt"></i> My Answers</a></li>
+      <li><a href="#" data-section="upgrade"><i class="fas fa-arrow-up"></i> Upgrade</a></li>
+      <li><a href="#" data-section="withdraw"><i class="fas fa-money-bill-wave"></i> Withdraw</a></li>
     </ul>
-  </div>
+  </aside>
 
-  <!-- Main content -->
-  <div class="main-content">
+  <main class="main">
     <header>
-      <div class="user-info" id="userEmail">Loading...</div>
-      <button class="logout-btn" id="logoutBtn">Logout</button>
+      <div></div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="user-email" id="userEmail">loading...</div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
     </header>
 
-    <!-- Dashboard Overview -->
-    <div id="dashboard" class="section active">
+    <section id="overview" class="section active">
       <div class="cards">
         <div class="card"><h3>Balance</h3><p id="balance">0 KSH</p></div>
-        <div class="card"><h3>Question Limit</h3><p id="limit">1 per day</p></div>
-        <div class="card"><h3>Status</h3><p id="status">Pending</p></div>
+        <div class="card"><h3>Limit</h3><p id="qLimit">1/day</p></div>
+        <div class="card"><h3>Status</h3><p id="accountStatus">pending</p></div>
       </div>
-    </div>
+    </section>
 
-    <!-- Available Questions -->
-    <div id="questions" class="section">
+    <section id="available" class="section">
       <h2>Available Questions</h2>
-      <div id="questionList"></div>
-    </div>
+      <div id="questionsContainer"></div>
+    </section>
 
-    <!-- My Answers -->
-    <div id="answers" class="section">
+    <section id="myanswers" class="section">
       <h2>My Answers</h2>
-      <div id="answersList"></div>
-    </div>
+      <div id="myAnswersContainer"></div>
+    </section>
 
-    <!-- Upgrade -->
-    <div id="upgrade" class="section">
-      <h2>Upgrade Your Account</h2>
-      <p>Pay <strong>500 KSH</strong> to increase your question limit to 3 per day.</p>
-      <p>Till Number: <strong>1234567</strong></p>
-      <p>After payment, contact admin for confirmation.</p>
-    </div>
+    <!-- 🟢 UPDATED UPGRADE SECTION -->
+    <section id="upgrade" class="section">
+      <h2>Upgrade Account</h2>
+      <p>Pay <strong>500 KSH</strong> to unlock up to <strong>3 questions per day</strong>.</p>
+      <p><strong>Till Number: 1234567</strong></p>
+      <p>After payment, send your <strong>M-Pesa reference code</strong> to the admin below:</p>
+      <input type="text" id="mpesaRef" placeholder="Enter M-Pesa reference code (e.g. QJD3F7X)" />
+      <button class="btn" id="sendRefBtn">Send Reference Code</button>
+      <div id="paymentStatus" style="margin-top:10px;color:var(--muted)"></div>
+    </section>
 
-    <!-- Withdraw -->
-    <div id="withdraw" class="section">
-      <h2>Withdraw Funds</h2>
-      <p>Your balance must be at least <strong>5000 KSH</strong> to withdraw.</p>
-      <button class="btn" id="withdrawBtn">Withdraw to M-Pesa</button>
-    </div>
-  </div>
+    <section id="withdraw" class="section">
+      <h2>Withdraw Earnings</h2>
+      <p>Balance must be ≥ 5000 KSH.</p>
+      <input id="mpesaPhone" type="tel" placeholder="M-Pesa phone (07XXXXXXXX)">
+      <button class="btn" id="withdrawBtn">Request Withdraw</button>
+      <div id="withdrawMessage" style="margin-top:10px;color:var(--muted)"></div>
+    </section>
+  </main>
+</div>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabaseUrl = "https://bftwskejmvopnpcdgmua.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const supabase = createClient(
-      "https://bftwskejmvopnpcdgmua.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU"
-    );
+// Basic auth/session
+const { data: { user } } = await supabase.auth.getUser();
+if(!user) window.location.href="index.html";
+document.getElementById("userEmail").textContent=user.email;
 
-    const userEmailEl = document.getElementById("userEmail");
-    const balanceEl = document.getElementById("balance");
-    const limitEl = document.getElementById("limit");
-    const statusEl = document.getElementById("status");
-    const questionList = document.getElementById("questionList");
-    const answersList = document.getElementById("answersList");
+// Load profile
+let { data: profile } = await supabase.from("profiles").select("*").eq("email", user.email).single();
+document.getElementById("balance").textContent=(profile.balance||0)+" KSH";
+document.getElementById("qLimit").textContent=profile.upgraded?"3/day":"1/day";
+document.getElementById("accountStatus").textContent=profile.status||"pending";
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      userEmailEl.textContent = user.email;
+// nav
+document.querySelectorAll(".nav a").forEach(a=>{
+  a.onclick=e=>{
+    e.preventDefault();
+    document.querySelectorAll(".nav a").forEach(x=>x.classList.remove("active"));
+    a.classList.add("active");
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(a.dataset.section).classList.add("active");
+  };
+});
 
-      // Fetch profile info
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("balance, status, upgraded")
-        .eq("email", user.email)
-        .single();
+// send reference code
+document.getElementById("sendRefBtn").onclick=async()=>{
+  const ref=document.getElementById("mpesaRef").value.trim();
+  if(!ref)return alert("Enter M-Pesa reference code");
+  const { error }=await supabase.from("payments").insert([
+    { user_id:profile.id, amount:500, ref_code:ref, status:"pending" }
+  ]);
+  if(error)return alert("Failed: "+error.message);
+  document.getElementById("paymentStatus").textContent="Reference sent. Admin will confirm soon.";
+  alert("✅ Reference sent successfully!");
+};
 
-      if (profile) {
-        balanceEl.textContent = profile.balance + " KSH";
-        statusEl.textContent = profile.status;
-        limitEl.textContent = profile.upgraded ? "3 per day" : "1 per day";
-      }
+// withdraw
+document.getElementById("withdrawBtn").onclick=async()=>{
+  const phone=document.getElementById("mpesaPhone").value.trim();
+  if((profile.balance||0)<5000)return alert("Balance too low.");
+  if(!phone)return alert("Enter phone number.");
+  const { error }=await supabase.from("payments").insert([
+    { user_id:profile.id, amount:-profile.balance, status:"withdraw_requested", ref_code:phone }
+  ]);
+  if(error)return alert("Failed: "+error.message);
+  document.getElementById("withdrawMessage").textContent="Withdrawal requested to "+phone;
+  alert("✅ Withdrawal request sent.");
+};
 
-      // Fetch questions
-      const { data: questions } = await supabase.from("questions").select("*");
-      questionList.innerHTML = questions.length
-        ? questions.map(q => `<div class="question"><p>${q.question_text}</p><small>Pay: ${q.pay_amount} KSH</small></div>`).join('')
-        : "<p>No questions available yet.</p>";
-
-      // Fetch answers
-      const { data: answers } = await supabase.from("answers").select("*").eq("user_email", user.email);
-      answersList.innerHTML = answers.length
-        ? answers.map(a => `<div class="answer"><p>Question ID: ${a.question_id}</p><p>Status: ${a.status}</p></div>`).join('')
-        : "<p>You haven’t submitted any answers yet.</p>";
-    }
-
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      window.location.href = "index.html";
-    });
-
-    // Navigation
-    const navLinks = document.querySelectorAll(".nav-links a");
-    const sections = document.querySelectorAll(".section");
-    navLinks.forEach(link => {
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        navLinks.forEach(l => l.classList.remove("active"));
-        link.classList.add("active");
-        sections.forEach(sec => sec.classList.remove("active"));
-        document.getElementById(link.dataset.section).classList.add("active");
-      });
-    });
-
-    // Withdraw
-    document.getElementById("withdrawBtn").addEventListener("click", () => {
-      if (parseInt(balanceEl.textContent) < 5000) {
-        alert("❌ You need at least 5000 KSH to withdraw.");
-      } else {
-        alert("✅ Withdrawal request submitted! Admin will process your payment.");
-      }
-    });
-  </script>
+// logout
+document.getElementById("logoutBtn").onclick=async()=>{
+  await supabase.auth.signOut();window.location.href="index.html";
+};
+</script>
 </body>
 </html>
-
