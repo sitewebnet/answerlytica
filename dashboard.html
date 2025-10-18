@@ -19,14 +19,14 @@
     body{margin:0;background:var(--bg);color:#212529}
     .app{display:flex;min-height:100vh;}
     .sidebar{width:260px;background:var(--card);padding:24px;box-shadow:2px 0 10px rgba(0,0,0,0.04);position:fixed;left:0;top:0;bottom:0;}
-    .logo{font-size:1.25rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:18px}
+    .logo{font-size:1.4rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:2px}
     .nav{list-style:none;padding:0;margin:0}
     .nav li{margin-bottom:8px}
     .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:var(--muted);text-decoration:none;transition:all .15s;}
     .nav a.active,.nav a:hover{background:var(--primary);color:white;}
     .main{margin-left:260px;padding:22px;flex:1;}
     header{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:18px;}
-    .user-email{color:var(--primary);font-weight:600;}
+    .user-email{color:var(--primary);font-weight:500;}
     .logout-btn{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:18px;}
     .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);text-align:center;}
@@ -163,3 +163,4 @@ document.getElementById("logoutBtn").onclick=async()=>{
 </script>
 </body>
 </html>
+
