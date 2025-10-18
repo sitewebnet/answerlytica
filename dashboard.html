@@ -3,48 +3,127 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Answerlytica</title>
+  <title>Answerlytica Dashboard</title>
   <link rel="icon" href="https://img.icons8.com/ios-filled/50/4a90e2/graduation-cap.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root{
+    :root {
       --primary:#4361ee;
-      --muted:#6c757d;
-      --bg:#f8f9fa;
+      --primary-light:#5e7bff;
+      --bg:#f3f6fc;
       --card:#ffffff;
-      --border:#e9ecef;
+      --border:#e2e8f0;
+      --muted:#6c757d;
+      --radius:16px;
+      --transition:all 0.3s ease;
     }
+
     *{box-sizing:border-box;font-family:'Poppins',sans-serif;}
-    body{margin:0;background:var(--bg);color:#212529}
+    body{margin:0;background:var(--bg);color:#1e1e2f;overflow-x:hidden;}
+
+    /* Layout */
     .app{display:flex;min-height:100vh;}
-    .sidebar{width:260px;background:var(--card);padding:24px;box-shadow:2px 0 10px rgba(0,0,0,0.04);position:fixed;left:0;top:0;bottom:0;}
-    .logo{font-size:1.4rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:2px}
-    .nav{list-style:none;padding:0;margin:0}
-    .nav li{margin-bottom:8px}
-    .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:var(--muted);text-decoration:none;transition:all .15s;}
-    .nav a.active,.nav a:hover{background:var(--primary);color:white;}
-    .main{margin-left:260px;padding:22px;flex:1;}
-    header{display:flex;justify-content:space-between;align-items:center;background:var(--card);padding:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:18px;}
+    .sidebar{
+      width:260px;background:linear-gradient(180deg,#4361ee,#5e7bff);
+      padding:24px;position:fixed;left:0;top:0;bottom:0;
+      transition:var(--transition);z-index:999;
+      box-shadow:2px 0 12px rgba(0,0,0,0.1);
+    }
+    .sidebar.collapsed{transform:translateX(-100%);}
+    .logo{font-size:1.4rem;color:#fff;font-weight:600;text-align:center;margin-bottom:32px;}
+    .nav{list-style:none;padding:0;margin:0;}
+    .nav li{margin-bottom:10px;}
+    .nav a{
+      display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius);
+      color:#fff;text-decoration:none;opacity:0.9;transition:var(--transition);
+    }
+    .nav a:hover,.nav a.active{background:rgba(255,255,255,0.15);opacity:1;}
+
+    /* Main content */
+    .main{margin-left:260px;flex:1;padding:24px;transition:var(--transition);}
+    @media(max-width:768px){.main{margin-left:0;}}
+
+    /* Header */
+    header{
+      position:sticky;top:0;z-index:10;background:var(--card);
+      padding:14px 20px;border-radius:var(--radius);
+      display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom:24px;
+    }
+    .menu-btn{display:none;font-size:1.4rem;color:var(--primary);cursor:pointer;}
+    @media(max-width:768px){.menu-btn{display:block;}}
+
+    .user-info{display:flex;align-items:center;gap:12px;}
     .user-email{color:var(--primary);font-weight:500;}
-    .logout-btn{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:18px;}
-    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);text-align:center;}
-    .card h3{margin:0 0 6px 0;color:var(--primary);font-size:0.95rem;}
-    .card p{margin:0;font-size:1.25rem;font-weight:600;}
-    .section{display:none;background:var(--card);padding:18px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .logout-btn{
+      background:linear-gradient(90deg,#4361ee,#5e7bff);
+      color:white;border:none;padding:8px 14px;border-radius:10px;
+      cursor:pointer;transition:var(--transition);
+    }
+    .logout-btn:hover{opacity:0.9;}
+
+    /* Sections */
+    .section{display:none;animation:fadeIn 0.5s ease;}
     .section.active{display:block;}
-    .question,.answer{border:1px solid var(--border);background:#fff;padding:14px;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;}
-    .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-    .btn.secondary{background:#6c757d}
-    .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--border)}
-    input[type=text],input[type=tel]{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)}
-    .small{font-size:0.85rem;color:var(--muted)}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+    /* Cards */
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+    .card{
+      background:var(--card);padding:20px;border-radius:var(--radius);
+      box-shadow:0 4px 10px rgba(0,0,0,0.05);
+      text-align:center;transition:var(--transition);
+    }
+    .card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,0.08);}
+    .card h3{margin:0 0 6px;color:var(--primary);}
+    .card p{margin:0;font-weight:600;font-size:1.2rem;}
+
+    /* Upgrade / Withdraw cards */
+    .glass-card{
+      background:rgba(255,255,255,0.8);
+      border:1px solid rgba(255,255,255,0.2);
+      backdrop-filter:blur(10px);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 4px 16px rgba(67,97,238,0.15);
+      animation:fadeIn 0.6s ease;
+    }
+
+    input,button{
+      font-size:1rem;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      width:100%;
+      margin-top:10px;
+      transition:var(--transition);
+    }
+    button{
+      background:linear-gradient(90deg,#4361ee,#5e7bff);
+      color:white;border:none;cursor:pointer;font-weight:500;
+    }
+    button:hover{opacity:0.9;}
+    input:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 2px rgba(67,97,238,0.1);}
+
+    /* Withdraw section extras */
+    .progress-bar{
+      height:8px;background:var(--border);
+      border-radius:10px;overflow:hidden;margin-top:12px;
+    }
+    .progress-bar span{
+      display:block;height:100%;background:linear-gradient(90deg,#4361ee,#5e7bff);
+      width:0%;transition:width 1s ease;
+    }
+
+    .status-text{color:var(--muted);margin-top:10px;font-size:0.9rem;}
   </style>
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="logo"><i class="fas fa-graduation-cap"></i> Answerlytica</div>
     <ul class="nav">
       <li><a href="#" data-section="overview" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
@@ -57,13 +136,14 @@
 
   <main class="main">
     <header>
-      <div></div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="user-email" id="userEmail">loading...</div>
+      <i class="fas fa-bars menu-btn" id="menuBtn"></i>
+      <div class="user-info">
+        <div class="user-email" id="userEmail">Loading...</div>
         <button class="logout-btn" id="logoutBtn">Logout</button>
       </div>
     </header>
 
+    <!-- Overview -->
     <section id="overview" class="section active">
       <div class="cards">
         <div class="card"><h3>Balance</h3><p id="balance">0 KSH</p></div>
@@ -72,33 +152,41 @@
       </div>
     </section>
 
+    <!-- Available Questions -->
     <section id="available" class="section">
       <h2>Available Questions</h2>
       <div id="questionsContainer"></div>
     </section>
 
+    <!-- My Answers -->
     <section id="myanswers" class="section">
       <h2>My Answers</h2>
       <div id="myAnswersContainer"></div>
     </section>
 
-    <!-- 🟢 UPDATED UPGRADE SECTION -->
+    <!-- Upgrade -->
     <section id="upgrade" class="section">
-      <h2>Upgrade Account</h2>
-      <p>Pay <strong>500 KSH</strong> to unlock up to <strong>3 questions per day</strong>.</p>
-      <p><strong>Till Number: 1234567</strong></p>
-      <p>After payment, send your <strong>M-Pesa reference code</strong> to the admin below:</p>
-      <input type="text" id="mpesaRef" placeholder="Enter M-Pesa reference code (e.g. QJD3F7X)" />
-      <button class="btn" id="sendRefBtn">Send Reference Code</button>
-      <div id="paymentStatus" style="margin-top:10px;color:var(--muted)"></div>
+      <div class="glass-card">
+        <h2>Upgrade Account</h2>
+        <p>Pay <strong>500 KSH</strong> to unlock up to <strong>3 questions per day</strong>.</p>
+        <p><strong>Till Number: 1234567</strong></p>
+        <p>After payment, send your <strong>M-Pesa reference code</strong> to the admin below:</p>
+        <input type="text" id="mpesaRef" placeholder="Enter M-Pesa reference code (e.g. QJD3F7X)" />
+        <button id="sendRefBtn"><i class="fas fa-paper-plane"></i> Send Reference Code</button>
+        <div id="paymentStatus" class="status-text"></div>
+      </div>
     </section>
 
+    <!-- Withdraw -->
     <section id="withdraw" class="section">
-      <h2>Withdraw Earnings</h2>
-      <p>Balance must be ≥ 5000 KSH.</p>
-      <input id="mpesaPhone" type="tel" placeholder="M-Pesa phone (07XXXXXXXX)">
-      <button class="btn" id="withdrawBtn">Request Withdraw</button>
-      <div id="withdrawMessage" style="margin-top:10px;color:var(--muted)"></div>
+      <div class="glass-card">
+        <h2>Withdraw Earnings</h2>
+        <p>Balance must be at least <strong>5000 KSH</strong> to withdraw.</p>
+        <div class="progress-bar"><span id="progressBar"></span></div>
+        <input id="mpesaPhone" type="tel" placeholder="M-Pesa phone (07XXXXXXXX)">
+        <button id="withdrawBtn"><i class="fas fa-wallet"></i> Request Withdraw</button>
+        <div id="withdrawMessage" class="status-text"></div>
+      </div>
     </section>
   </main>
 </div>
@@ -109,58 +197,76 @@ const supabaseUrl = "https://bftwskejmvopnpcdgmua.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Basic auth/session
+// Auth check
 const { data: { user } } = await supabase.auth.getUser();
-if(!user) window.location.href="index.html";
-document.getElementById("userEmail").textContent=user.email;
+if (!user) window.location.href = "index.html";
+document.getElementById("userEmail").textContent = user.email;
 
-// Load profile
+// Load user profile
 let { data: profile } = await supabase.from("profiles").select("*").eq("email", user.email).single();
-document.getElementById("balance").textContent=(profile.balance||0)+" KSH";
-document.getElementById("qLimit").textContent=profile.upgraded?"3/day":"1/day";
-document.getElementById("accountStatus").textContent=profile.status||"pending";
+document.getElementById("balance").textContent = (profile.balance || 0) + " KSH";
+document.getElementById("qLimit").textContent = profile.upgraded ? "3/day" : "1/day";
+document.getElementById("accountStatus").textContent = profile.status || "pending";
 
-// nav
-document.querySelectorAll(".nav a").forEach(a=>{
-  a.onclick=e=>{
+// Sidebar toggle
+const sidebar = document.getElementById("sidebar");
+document.getElementById("menuBtn").onclick = () => sidebar.classList.toggle("collapsed");
+
+// Section switching
+document.querySelectorAll(".nav a").forEach(link => {
+  link.addEventListener("click", e => {
     e.preventDefault();
-    document.querySelectorAll(".nav a").forEach(x=>x.classList.remove("active"));
-    a.classList.add("active");
-    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-    document.getElementById(a.dataset.section).classList.add("active");
-  };
+    document.querySelectorAll(".nav a").forEach(x => x.classList.remove("active"));
+    link.classList.add("active");
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+    const sectionId = link.dataset.section;
+    document.getElementById(sectionId).classList.add("active");
+    localStorage.setItem("activeSection", sectionId);
+  });
 });
 
-// send reference code
-document.getElementById("sendRefBtn").onclick=async()=>{
-  const ref=document.getElementById("mpesaRef").value.trim();
-  if(!ref)return alert("Enter M-Pesa reference code");
-  const { error }=await supabase.from("payments").insert([
-    { user_id:profile.id, amount:500, ref_code:ref, status:"pending" }
+// Restore active section
+window.addEventListener("load", () => {
+  const last = localStorage.getItem("activeSection") || "overview";
+  document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+  document.getElementById(last).classList.add("active");
+  document.querySelectorAll(".nav a").forEach(a => a.classList.remove("active"));
+  document.querySelector(`.nav a[data-section="${last}"]`)?.classList.add("active");
+});
+
+// Update progress bar
+const balance = profile.balance || 0;
+const percent = Math.min((balance / 5000) * 100, 100);
+document.getElementById("progressBar").style.width = percent + "%";
+
+// Send M-Pesa reference
+document.getElementById("sendRefBtn").onclick = async () => {
+  const ref = document.getElementById("mpesaRef").value.trim();
+  if (!ref) return alert("Enter your M-Pesa reference code");
+  const { error } = await supabase.from("payments").insert([
+    { user_id: profile.id, amount: 500, ref_code: ref, status: "pending" }
   ]);
-  if(error)return alert("Failed: "+error.message);
-  document.getElementById("paymentStatus").textContent="Reference sent. Admin will confirm soon.";
-  alert("✅ Reference sent successfully!");
+  if (error) return alert("Error: " + error.message);
+  document.getElementById("paymentStatus").textContent = "✅ Reference sent! Admin will confirm soon.";
 };
 
-// withdraw
-document.getElementById("withdrawBtn").onclick=async()=>{
-  const phone=document.getElementById("mpesaPhone").value.trim();
-  if((profile.balance||0)<5000)return alert("Balance too low.");
-  if(!phone)return alert("Enter phone number.");
-  const { error }=await supabase.from("payments").insert([
-    { user_id:profile.id, amount:-profile.balance, status:"withdraw_requested", ref_code:phone }
+// Withdraw request
+document.getElementById("withdrawBtn").onclick = async () => {
+  const phone = document.getElementById("mpesaPhone").value.trim();
+  if (balance < 5000) return alert("Your balance is below 5000 KSH.");
+  if (!phone) return alert("Enter your M-Pesa number.");
+  const { error } = await supabase.from("payments").insert([
+    { user_id: profile.id, amount: -balance, ref_code: phone, status: "withdraw_requested" }
   ]);
-  if(error)return alert("Failed: "+error.message);
-  document.getElementById("withdrawMessage").textContent="Withdrawal requested to "+phone;
-  alert("✅ Withdrawal request sent.");
+  if (error) return alert("Error: " + error.message);
+  document.getElementById("withdrawMessage").textContent = "✅ Withdrawal requested to " + phone;
 };
 
-// logout
-document.getElementById("logoutBtn").onclick=async()=>{
-  await supabase.auth.signOut();window.location.href="index.html";
+// Logout
+document.getElementById("logoutBtn").onclick = async () => {
+  await supabase.auth.signOut();
+  window.location.href = "index.html";
 };
 </script>
 </body>
 </html>
-
