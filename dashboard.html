@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Answerlytica Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #4361ee;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --gray: #6c757d;
+      --border: #dee2e6;
+    }
+
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--light-bg);
+      display: flex;
+      min-height: 100vh;
+      color: #212529;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: white;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+      padding: 1.5rem 1rem;
+      position: fixed;
+      top: 0; bottom: 0;
+      transition: all 0.3s ease;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .nav-links {
+      list-style: none;
+    }
+
+    .nav-links li {
+      margin-bottom: 1rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--gray);
+      font-weight: 500;
+      display: block;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      padding: 1rem 2rem;
+    }
+
+    header {
+      background: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header .user-info {
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .logout-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #3146c8;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .card h3 { color: var(--primary); margin-bottom: 0.5rem; }
+    .card p { font-size: 1.2rem; font-weight: 600; }
+
+    /* Section container */
+    .section {
+      display: none;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .section.active { display: block; }
+
+    .question, .answer {
+      background: var(--light-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+
+    .btn:hover { background: #3146c8; }
+
+    @media (max-width: 768px) {
+      .sidebar { position: fixed; left: -250px; }
+      .sidebar.active { left: 0; }
+      .main-content { margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo"><i class="fas fa-graduation-cap"></i> Answerlytica</div>
+    <ul class="nav-links">
+      <li><a href="#" class="active" data-section="dashboard">🏠 Dashboard</a></li>
+      <li><a href="#" data-section="questions">📋 Available Questions</a></li>
+      <li><a href="#" data-section="answers">✅ My Answers</a></li>
+      <li><a href="#" data-section="upgrade">💳 Upgrade</a></li>
+      <li><a href="#" data-section="withdraw">💰 Withdraw</a></li>
+    </ul>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <header>
+      <div class="user-info" id="userEmail">Loading...</div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
+
+    <!-- Dashboard Overview -->
+    <div id="dashboard" class="section active">
+      <div class="cards">
+        <div class="card"><h3>Balance</h3><p id="balance">0 KSH</p></div>
+        <div class="card"><h3>Question Limit</h3><p id="limit">1 per day</p></div>
+        <div class="card"><h3>Status</h3><p id="status">Pending</p></div>
+      </div>
+    </div>
+
+    <!-- Available Questions -->
+    <div id="questions" class="section">
+      <h2>Available Questions</h2>
+      <div id="questionList"></div>
+    </div>
+
+    <!-- My Answers -->
+    <div id="answers" class="section">
+      <h2>My Answers</h2>
+      <div id="answersList"></div>
+    </div>
+
+    <!-- Upgrade -->
+    <div id="upgrade" class="section">
+      <h2>Upgrade Your Account</h2>
+      <p>Pay <strong>500 KSH</strong> to increase your question limit to 3 per day.</p>
+      <p>Till Number: <strong>1234567</strong></p>
+      <p>After payment, contact admin for confirmation.</p>
+    </div>
+
+    <!-- Withdraw -->
+    <div id="withdraw" class="section">
+      <h2>Withdraw Funds</h2>
+      <p>Your balance must be at least <strong>5000 KSH</strong> to withdraw.</p>
+      <button class="btn" id="withdrawBtn">Withdraw to M-Pesa</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabase = createClient(
+      "https://bftwskejmvopnpcdgmua.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU"
+    );
+
+    const userEmailEl = document.getElementById("userEmail");
+    const balanceEl = document.getElementById("balance");
+    const limitEl = document.getElementById("limit");
+    const statusEl = document.getElementById("status");
+    const questionList = document.getElementById("questionList");
+    const answersList = document.getElementById("answersList");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      userEmailEl.textContent = user.email;
+
+      // Fetch profile info
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("balance, status, upgraded")
+        .eq("email", user.email)
+        .single();
+
+      if (profile) {
+        balanceEl.textContent = profile.balance + " KSH";
+        statusEl.textContent = profile.status;
+        limitEl.textContent = profile.upgraded ? "3 per day" : "1 per day";
+      }
+
+      // Fetch questions
+      const { data: questions } = await supabase.from("questions").select("*");
+      questionList.innerHTML = questions.length
+        ? questions.map(q => `<div class="question"><p>${q.question_text}</p><small>Pay: ${q.pay_amount} KSH</small></div>`).join('')
+        : "<p>No questions available yet.</p>";
+
+      // Fetch answers
+      const { data: answers } = await supabase.from("answers").select("*").eq("user_email", user.email);
+      answersList.innerHTML = answers.length
+        ? answers.map(a => `<div class="answer"><p>Question ID: ${a.question_id}</p><p>Status: ${a.status}</p></div>`).join('')
+        : "<p>You haven’t submitted any answers yet.</p>";
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.href = "index.html";
+    });
+
+    // Navigation
+    const navLinks = document.querySelectorAll(".nav-links a");
+    const sections = document.querySelectorAll(".section");
+    navLinks.forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        navLinks.forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+        sections.forEach(sec => sec.classList.remove("active"));
+        document.getElementById(link.dataset.section).classList.add("active");
+      });
+    });
+
+    // Withdraw
+    document.getElementById("withdrawBtn").addEventListener("click", () => {
+      if (parseInt(balanceEl.textContent) < 5000) {
+        alert("❌ You need at least 5000 KSH to withdraw.");
+      } else {
+        alert("✅ Withdrawal request submitted! Admin will process your payment.");
+      }
+    });
+  </script>
+</body>
+</html>
