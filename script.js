@@ -234,50 +234,57 @@ async function loadMyAnswers(){
 
   myAnswersContainer.innerHTML = '';
   
-  // Create a table-like structure
-  const table = document.createElement('div');
+  // Create a proper table structure
+  const table = document.createElement('table');
   table.style.cssText = `
-    display: table;
     width: 100%;
-    background: #e2e8f0;
+    border-collapse: collapse;
+    background: white;
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     margin-top: 16px;
-    border-collapse: collapse;
   `;
   
   // Table header
-  const header = document.createElement('div');
-  header.style.cssText = `
-    display: table-row;
+  const thead = document.createElement('thead');
+  thead.style.cssText = `
     background: var(--g2);
     color: white;
-    font-weight: 600;
   `;
-  header.innerHTML = `
-    <div style="display: table-cell; padding: 12px;">Job / Question</div>
-    <div style="display: table-cell; padding: 12px;">Pay</div>
-    <div style="display: table-cell; padding: 12px;">Status</div>
-    <div style="display: table-cell; padding: 12px;">Actions</div>
+  thead.innerHTML = `
+    <tr>
+      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Job / Question</th>
+      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Pay</th>
+      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Status</th>
+      <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Actions</th>
+    </tr>
   `;
-  table.appendChild(header);
-
+  table.appendChild(thead);
+  
+  // Table body
+  const tbody = document.createElement('tbody');
+  
   // Table rows
   for(const a of ans){
     const questionText = a.questions?.question_text || `Question #${a.question_id}`;
     const payAmount = a.questions?.pay_amount || 0;
     const earnedAmount = a.earned || 0;
     
-    const row = document.createElement('div');
+    const row = document.createElement('tr');
     row.style.cssText = `
-      display: table-row;
-      background: white;
+      border-bottom: 1px solid #e2e8f0;
     `;
     
     row.innerHTML = `
-      <div style="font-weight: 500;">${escapeHtml(questionText)}</div>
-      <div>${payAmount} KSH</div>
-      <div>
+      <td style="padding: 12px; vertical-align: top;">
+        <div style="font-weight: 500; margin-bottom: 4px;">${escapeHtml(questionText)}</div>
+      </td>
+      <td style="padding: 12px; vertical-align: top;">
+        <div style="font-weight: 600;">${payAmount} KSH</div>
+        ${earnedAmount > 0 ? `<div style="font-size: 0.8rem; color: #10b981;">Earned: ${earnedAmount} KSH</div>` : ''}
+      </td>
+      <td style="padding: 12px; vertical-align: top;">
         <span style="
           padding: 4px 8px;
           border-radius: 12px;
@@ -285,16 +292,26 @@ async function loadMyAnswers(){
           font-weight: 600;
           background: ${a.status === 'approved' ? '#10b981' : a.status === 'rejected' ? '#ef4444' : '#f59e0b'};
           color: white;
+          display: inline-block;
         ">${escapeHtml(a.status)}</span>
-        ${earnedAmount > 0 ? `<div style="font-size: 0.8rem; margin-top: 4px;">Earned: ${earnedAmount} KSH</div>` : ''}
-      </div>
-      <div>
-        <a class="btn-ghost" href="${a.file_url}" target="_blank" rel="noopener">View PDF</a>
-      </div>
+      </td>
+      <td style="padding: 12px; vertical-align: top;">
+        <a class="btn-ghost" href="${a.file_url}" target="_blank" rel="noopener" style="
+          display: inline-block;
+          padding: 6px 12px;
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 4px;
+          color: #495057;
+          text-decoration: none;
+          font-size: 0.9rem;
+        ">View PDF</a>
+      </td>
     `;
-    table.appendChild(row);
+    tbody.appendChild(row);
   }
   
+  table.appendChild(tbody);
   myAnswersContainer.appendChild(table);
 }
 
@@ -421,6 +438,3 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
-
-
-
