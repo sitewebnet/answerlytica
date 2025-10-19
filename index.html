@@ -394,23 +394,44 @@
       if (e.target === loginModal) closeModal(loginModal);
     };
 
-    // REGISTER USER
+    // REGISTER USER - FIXED VERSION
     const regForm = document.getElementById("registrationForm");
     regForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const { error: authError } = await supabase.auth.signUp({ email, password });
-      if (authError) return alert("❌ " + authError.message);
+      
+      // 1. Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({ 
+        email, 
+        password 
+      });
+      
+      if (authError) {
+        alert("❌ " + authError.message);
+        return;
+      }
 
-      await supabase.from("profiles").insert([{
+      // 2. Create profile WITH THE USER ID (CRITICAL FIX)
+      const { error: profileError } = await supabase.from("profiles").insert([{
+        id: authData.user.id,  // ← THIS WAS MISSING - CAUSED ALL THE PROBLEMS!
         name: document.getElementById("fullName").value,
         national_id: document.getElementById("idNumber").value,
         dob: document.getElementById("dob").value,
-        email,
+        email: email,
         education: document.getElementById("education").value,
-        experience_years: document.getElementById("experience").value,
+        experience_years: parseInt(document.getElementById("experience").value),
+        balance: 0,
+        status: 'active',
+        upgraded: false,
+        created_at: new Date().toISOString()
       }]);
+
+      if (profileError) {
+        console.error("Profile error:", profileError);
+        alert("❌ Profile creation failed: " + profileError.message);
+        return;
+      }
 
       alert("✅ Registration successful! Please log in.");
       regForm.reset();
@@ -444,5 +465,3 @@
   </script>
 </body>
 </html>
-
-
