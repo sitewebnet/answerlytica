@@ -237,31 +237,28 @@ async function loadMyAnswers(){
   // Create a table-like structure
   const table = document.createElement('div');
   table.style.cssText = `
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 1px;
+    display: table;
+    width: 100%;
     background: #e2e8f0;
     border-radius: 8px;
     overflow: hidden;
     margin-top: 16px;
+    border-collapse: collapse;
   `;
   
   // Table header
   const header = document.createElement('div');
   header.style.cssText = `
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    display: table-row;
     background: var(--g2);
     color: white;
     font-weight: 600;
-    padding: 12px;
   `;
   header.innerHTML = `
-    <div>Job / Question</div>
-    <div>Pay</div>
-    <div>Status</div>
-    <div>Actions</div>
+    <div style="display: table-cell; padding: 12px;">Job / Question</div>
+    <div style="display: table-cell; padding: 12px;">Pay</div>
+    <div style="display: table-cell; padding: 12px;">Status</div>
+    <div style="display: table-cell; padding: 12px;">Actions</div>
   `;
   table.appendChild(header);
 
@@ -273,11 +270,8 @@ async function loadMyAnswers(){
     
     const row = document.createElement('div');
     row.style.cssText = `
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      display: table-row;
       background: white;
-      padding: 12px;
-      align-items: center;
     `;
     
     row.innerHTML = `
@@ -427,5 +421,6 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
+
 
 
