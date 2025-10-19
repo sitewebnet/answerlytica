@@ -216,7 +216,7 @@ async function loadMyAnswers(){
       status, 
       earned, 
       created_at,
-      questions (question_text, pay_amount)
+      questions!fk_answers_question_id (question_text, pay_amount)
     `)
     .eq('user_email', user.email)
     .order('created_at', { ascending: false });
@@ -427,4 +427,5 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
+
 
