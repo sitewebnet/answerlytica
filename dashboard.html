@@ -862,7 +862,7 @@
 
       myAnswersContainer.innerHTML = '';
       for(const a of ans){
-        const q = questions.find(x=>x.id===a.question_id);
+        const q = questions.find(x=>x.id===Number(a.question_id));
         const node = document.createElement('div');
         node.className = 'question';
         node.innerHTML = `
