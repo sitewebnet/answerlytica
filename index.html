@@ -458,10 +458,11 @@
       const email = prompt("Enter your email to reset password:");
       if (!email) return;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + "/reset.html",
+        redirectTo: "https://sitewebnet.github.io/answerlytica/reset.html",
       });
       alert(error ? "❌ " + error.message : "✅ Check your email for reset link.");
     });
   </script>
 </body>
 </html>
+
