@@ -643,9 +643,8 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     // ------------------ CONFIG ------------------
-    // Use your project URL (already set) and replace the anon key placeholder with your anon key
     const SUPABASE_URL = "https://bftwskejmvopnpcdgmua.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU"; // ← REPLACE with your anon key
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmdHdza2VqbXZvcG5wY2RnbXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MzgxNDAsImV4cCI6MjA3NjMxNDE0MH0.VOlRyhAsf8AX09urInqe2R8473TQzAeiOzwR4yVn8JU";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ------------------ UI refs ------------------
@@ -727,6 +726,9 @@
       // restore section
       const last = localStorage.getItem('activeSection') || 'overview';
       setActiveSection(last);
+
+      // Set up realtime balance updates
+      setupRealtimeUpdates();
     }
 
     function renderProfile(){
@@ -765,20 +767,98 @@
           openSubmitModal(id);
         });
       });
-      questionsContainer.querySelectorAll('.view-btn').forEach(b=>{
-        b.addEventListener('click', async ()=>{
-          const id = parseInt(b.dataset.id);
-          const { data } = await supabase.from('questions').select('*').eq('id', id).single();
-          alert(data.question_text + "\\n\\nPay: " + data.pay_amount + " KSH");
-        });
-      });
     }
 
-    // ------------------ MY ANSWERS ------------------
+    // ------------------ SUBMIT ANSWER (modal, storage, insert) ------------------
+    function openSubmitModal(questionId){
+      const limit = profile.upgraded ? 3 : 1;
+      const today = todayISO();
+      if(profile.last_answer_date === today && (profile.answers_today || 0) >= limit){
+        return alert(`You have reached your daily limit (${limit}). Upgrade to answer more.`);
+      }
+      currentQuestionId = questionId;
+      const q = questions.find(x => x.id === questionId);
+      modalQuestionText.textContent = q ? q.question_text : ('Question #' + questionId);
+      submitFeedback.textContent = '';
+      answerFile.value = '';
+      submitModal.classList.add('open');
+      submitModal.setAttribute('aria-hidden', 'false');
+    }
+
+    document.getElementById('submitAnswerBtn').addEventListener('click', async () => {
+      submitFeedback.textContent = '';
+      const file = answerFile.files[0];
+      if(!file) return submitFeedback.textContent = 'Please select a PDF.';
+      if(file.type !== 'application/pdf') return submitFeedback.textContent = 'Only PDF allowed.';
+      if(file.size > 10 * 1024 * 1024) return submitFeedback.textContent = 'Max 10MB allowed.';
+      if(!currentQuestionId) return submitFeedback.textContent = 'No question selected.';
+
+      try{
+        // Upload PDF to Supabase Storage
+        const safeEmail = user.email.replace(/[@.]/g,'_');
+        const path = `${safeEmail}/${Date.now()}_${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage.from('answers')
+          .upload(path, file);
+        if(uploadError) throw uploadError;
+
+        // Get signed URL
+        const { data: signed } = await supabase
+          .storage.from('answers')
+          .createSignedUrl(path, 60*60); // 1 hour
+
+        // Insert into answers table
+        const { error: insertErr } = await supabase.from('answers').insert([{
+          user_email: user.email,
+          question_id: currentQuestionId,
+          file_url: signed.signedUrl,
+          status: 'pending',
+          earned: 0, // start at 0 until admin approves
+          created_at: new Date().toISOString()
+        }]);
+        if(insertErr) throw insertErr;
+
+        // Update profile counters (last_answer_date + answers_today)
+        const today = todayISO();
+        let newCount = 1;
+        if(profile.last_answer_date === today) newCount = (profile.answers_today || 0) + 1;
+        const { error: updErr } = await supabase.from('profiles')
+          .update({ last_answer_date: today, answers_today: newCount })
+          .eq('id', profile.id);
+        if(!updErr){
+          profile.last_answer_date = today;
+          profile.answers_today = newCount;
+        }
+
+        // Refresh "My Submitted Answers" immediately
+        await loadMyAnswers();
+
+        submitModal.classList.remove('open');
+        submitModal.setAttribute('aria-hidden', 'true');
+        alert('Answer submitted — pending admin review.');
+
+      }catch(err){
+        console.error(err);
+        alert('Submission failed: ' + (err.message || err));
+      }
+    });
+
+    // ------------------ LOAD MY ANSWERS (with earned + status) ------------------
     async function loadMyAnswers(){
-      const { data: ans, error } = await supabase.from('answers').select('id, question_id, file_url, status, created_at').eq('user_email', user.email).order('created_at', { ascending:false });
-      if(error){ console.error('answers err', error); myAnswersContainer.innerHTML = '<div class="muted">Could not load answers.</div>'; return; }
-      if(!ans || ans.length===0){ myAnswersContainer.innerHTML = '<div class="muted">You have not submitted any answers yet.</div>'; return; }
+      const { data: ans, error } = await supabase.from('answers')
+        .select('id, question_id, file_url, status, earned, created_at')
+        .eq('user_email', user.email)
+        .order('created_at', { ascending:false });
+
+      if(error){ 
+        console.error('answers err', error); 
+        myAnswersContainer.innerHTML = '<div class="muted">Could not load answers.</div>'; 
+        return; 
+      }
+      if(!ans || ans.length===0){ 
+        myAnswersContainer.innerHTML = '<div class="muted">You have not submitted any answers yet.</div>'; 
+        return; 
+      }
 
       myAnswersContainer.innerHTML = '';
       for(const a of ans){
@@ -788,7 +868,7 @@
         node.innerHTML = `
           <div class="q-left">
             <div class="q-title">${escapeHtml(q?.question_text || 'Question #' + a.question_id)}</div>
-            <div class="q-meta">Status: <strong>${escapeHtml(a.status)}</strong> • Submitted: ${new Date(a.created_at).toLocaleString()}</div>
+            <div class="q-meta">Status: <strong>${escapeHtml(a.status)}</strong> • Earned: <strong>${a.earned || 0} KSH</strong> • Submitted: ${new Date(a.created_at).toLocaleString()}</div>
           </div>
           <div class="actions">
             <a class="btn-ghost" href="${a.file_url}" target="_blank" rel="noopener">View PDF</a>
@@ -798,71 +878,19 @@
       }
     }
 
-    // ------------------ SUBMIT ANSWER (modal, storage, insert) ------------------
-    function openSubmitModal(questionId){
-      // check daily limit
-      const limit = profile.upgraded ? 3 : 1;
-      const today = todayISO();
-      if(profile.last_answer_date === today && (profile.answers_today || 0) >= limit){
-        return alert(`You have reached your daily limit (${limit}). Upgrade to answer more.`);
+    // ------------------ REALTIME BALANCE UPDATE (optional) ------------------
+    function setupRealtimeUpdates() {
+      if(profile?.id){
+        supabase
+          .channel(`public:profiles:id=eq.${profile.id}`)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${profile.id}` }, payload => {
+            profile.balance = payload.new.balance;
+            balanceEl.textContent = profile.balance + ' KSH';
+            updateProgress();
+          })
+          .subscribe();
       }
-      currentQuestionId = questionId;
-      const q = questions.find(x=>x.id===questionId);
-      modalQuestionText.textContent = q ? q.question_text : ('Question #' + questionId);
-      submitFeedback.textContent = '';
-      answerFile.value = '';
-      submitModal.classList.add('open');
-      submitModal.setAttribute('aria-hidden','false');
     }
-
-    document.getElementById('closeModal').addEventListener('click', ()=>{ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true');});
-    document.getElementById('cancelAnswerBtn').addEventListener('click', ()=>{ submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true'); });
-
-    document.getElementById('submitAnswerBtn').addEventListener('click', async ()=>{
-      submitFeedback.textContent = '';
-      const file = answerFile.files[0];
-      if(!file) return submitFeedback.textContent = 'Please select a PDF.';
-      if(file.type !== 'application/pdf') return submitFeedback.textContent = 'Only PDF allowed.';
-      if(file.size > 10 * 1024 * 1024) return submitFeedback.textContent = 'Max 10MB allowed.';
-      if(!currentQuestionId) return submitFeedback.textContent = 'No question selected.';
-
-      try{
-        // upload
-        const safeEmail = user.email.replace(/[@.]/g,'_');
-        const path = `${safeEmail}/${Date.now()}_${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage.from('answers').upload(path, file);
-        if(uploadError){ console.error(uploadError); alert('Upload failed: '+uploadError.message); return; }
-
-        // create signed url (optional)
-        const { data: signed } = await supabase.storage.from('answers').createSignedUrl(path, 60*60); // 1 hour
-
-        // insert answers row
-        const { error: insertErr } = await supabase.from('answers').insert([{
-          user_email: user.email,
-          question_id: currentQuestionId,
-          file_url: signed.signedUrl,
-          status: 'pending'
-        }]);
-        if(insertErr){ console.error(insertErr); alert('Save failed: '+insertErr.message); return; }
-
-        // update profile counters (last_answer_date + answers_today)
-        const today = todayISO();
-        let newCount = 1;
-        if(profile.last_answer_date === today) newCount = (profile.answers_today || 0) + 1;
-        const { error: updErr } = await supabase.from('profiles').update({ last_answer_date: today, answers_today: newCount }).eq('id', profile.id);
-        if(!updErr){
-          profile.last_answer_date = today;
-          profile.answers_today = newCount;
-        }
-
-        alert('Answer submitted — pending admin review.');
-        submitModal.classList.remove('open'); submitModal.setAttribute('aria-hidden','true');
-        await loadMyAnswers();
-
-      }catch(err){
-        console.error(err); alert('Submission failed.');
-      }
-    });
 
     // ------------------ UPGRADE (send ref code) ------------------
     document.getElementById('sendRefBtn').addEventListener('click', async ()=>{
@@ -919,6 +947,16 @@
       }
     });
 
+    // modal close handlers
+    document.getElementById('closeModal').addEventListener('click', ()=>{ 
+      submitModal.classList.remove('open'); 
+      submitModal.setAttribute('aria-hidden','true');
+    });
+    document.getElementById('cancelAnswerBtn').addEventListener('click', ()=>{ 
+      submitModal.classList.remove('open'); 
+      submitModal.setAttribute('aria-hidden','true'); 
+    });
+
     // logout handler
     document.getElementById('logoutBtn').addEventListener('click', async ()=>{
       await supabase.auth.signOut();
@@ -927,15 +965,6 @@
 
     // start everything
     await init();
-
-    // reactive: update progress if profile changes in page (not automatic from DB)
-    updateProgress();
   </script>
 </body>
 </html>
-
-
-
-
-
-
