@@ -222,7 +222,7 @@ async function loadMyAnswers(){
     .order('created_at', { ascending: false });
 
   if(error){ 
-    console.error('answers err', error); 
+    console.error('ANSWERS ERROR DETAILS:', error.message, error.details, error.hint);
     myAnswersContainer.innerHTML = '<div class="muted">Could not load answers.</div>'; 
     return; 
   }
@@ -427,3 +427,4 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
+
