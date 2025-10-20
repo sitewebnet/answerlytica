@@ -163,19 +163,19 @@ document.getElementById('submitAnswerBtn').addEventListener('click', async () =>
     // Get signed URL (7 days for better user experience)
     const { data: signed } = await supabase
       .storage.from('answers')
-      .createSignedUrl(path, 60*60*24*7); // 7 days
+      .createSignedUrl(path, 60*60*24*7);
 
     // CRITICAL FIX: Get current user ID and include it in the insert
     const { data: { user: currentUser } } = await supabase.auth.getUser();
     
     // Insert into answers table WITH user_id
     const { error: insertErr } = await supabase.from('answers').insert([{
-      user_id: currentUser.id,  // ← CRITICAL: This fixes the NULL user_id issue
+      user_id: currentUser.id, 
       user_email: user.email,
       question_id: currentQuestionId,
       file_url: signed.signedUrl,
       status: 'pending',
-      earned: 0, // start at 0 until admin approves
+      earned: 0,
       created_at: new Date().toISOString()
     }]);
     if(insertErr) throw insertErr;
@@ -438,3 +438,4 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
+
