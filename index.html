@@ -424,7 +424,7 @@
 
       // 2. Create profile WITH THE USER ID (CRITICAL FIX)
       const { error: profileError } = await supabase.from("profiles").insert([{
-        id: authData.user.id,  // ← THIS WAS MISSING - CAUSED ALL THE PROBLEMS!
+        id: authData.user.id, 
         name: document.getElementById("fullName").value,
         national_id: document.getElementById("idNumber").value,
         dob: document.getElementById("dob").value,
@@ -483,6 +483,7 @@
     </script>
 </body>
 </html>
+
 
 
 
