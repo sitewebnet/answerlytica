@@ -144,14 +144,46 @@ function openSubmitModal(questionId){
 }
 
 document.getElementById('submitAnswerBtn').addEventListener('click', async () => {
-  submitFeedback.textContent = '';
+  // DISABLE BUTTON to prevent multiple clicks
+  const submitBtn = document.getElementById('submitAnswerBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending please wait...';
+  
+  submitFeedback.textContent = 'Sending please wait...';
   const file = answerFile.files[0];
-  if(!file) return submitFeedback.textContent = 'Please select a PDF.';
-  if(file.type !== 'application/pdf') return submitFeedback.textContent = 'Only PDF allowed.';
-  if(file.size > 10 * 1024 * 1024) return submitFeedback.textContent = 'Max 10MB allowed.';
-  if(!currentQuestionId) return submitFeedback.textContent = 'No question selected.';
+  
+  if(!file) {
+    submitFeedback.textContent = 'Please select a PDF.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Answer';
+    return;
+  }
+  
+  if(file.type !== 'application/pdf') {
+    submitFeedback.textContent = 'Only PDF allowed.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Answer';
+    return;
+  }
+  
+  if(file.size > 10 * 1024 * 1024) {
+    submitFeedback.textContent = 'Max 10MB allowed.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Answer';
+    return;
+  }
+  
+  if(!currentQuestionId) {
+    submitFeedback.textContent = 'No question selected.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Answer';
+    return;
+  }
 
   try{
+    // Show uploading progress
+    submitFeedback.textContent = 'Uploading PDF...';
+    
     // Upload PDF to Supabase Storage
     const safeEmail = user.email.replace(/[@.]/g,'_');
     const path = `${safeEmail}/${Date.now()}_${file.name}`;
@@ -160,17 +192,23 @@ document.getElementById('submitAnswerBtn').addEventListener('click', async () =>
       .upload(path, file);
     if(uploadError) throw uploadError;
 
-    // Get signed URL (7 days for better user experience)
+    // Show creating URL progress
+    submitFeedback.textContent = 'Creating download link...';
+    
+    // Get signed URL
     const { data: signed } = await supabase
       .storage.from('answers')
       .createSignedUrl(path, 60*60*24*7);
 
-    // CRITICAL FIX: Get current user ID and include it in the insert
+    // Show saving progress
+    submitFeedback.textContent = 'Saving your answer...';
+    
+    // Get current user ID
     const { data: { user: currentUser } } = await supabase.auth.getUser();
     
-    // Insert into answers table WITH user_id
+    // Insert into answers table
     const { error: insertErr } = await supabase.from('answers').insert([{
-      user_id: currentUser.id, 
+      user_id: currentUser.id,
       user_email: user.email,
       question_id: currentQuestionId,
       file_url: signed.signedUrl,
@@ -180,10 +218,13 @@ document.getElementById('submitAnswerBtn').addEventListener('click', async () =>
     }]);
     if(insertErr) throw insertErr;
 
-    // Update profile counters (last_answer_date + answers_today)
+    // Update profile counters
     const today = todayISO();
     let newCount = 1;
     if(profile.last_answer_date === today) newCount = (profile.answers_today || 0) + 1;
+    
+    submitFeedback.textContent = 'Updating your account...';
+    
     const { error: updErr } = await supabase.from('profiles')
       .update({ last_answer_date: today, answers_today: newCount })
       .eq('id', profile.id);
@@ -192,7 +233,7 @@ document.getElementById('submitAnswerBtn').addEventListener('click', async () =>
       profile.answers_today = newCount;
     }
 
-    // Refresh "My Submitted Answers" immediately
+    // Refresh answers and profile
     await loadMyAnswers();
     renderProfile();
 
@@ -203,6 +244,11 @@ document.getElementById('submitAnswerBtn').addEventListener('click', async () =>
   }catch(err){
     console.error(err);
     alert('Submission failed: ' + (err.message || err));
+  } finally {
+    // RE-ENABLE BUTTON whether success or error
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Answer';
+    submitFeedback.textContent = '';
   }
 });
 
@@ -438,4 +484,3 @@ document.getElementById('logoutBtn').addEventListener('click', async ()=>{
 
 // start everything
 await init();
-
